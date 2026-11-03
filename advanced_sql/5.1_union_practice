@@ -1,0 +1,30 @@
+/*
+Get the corresponding skill and skill type for each job posting in q1
+Includes those without any skills, too.
+Why? Look at the skills and the type for each job in the first quarter that has a salary > $70,000
+*/
+
+WITH Q1_jobs AS (
+SELECT *
+FROM january_jobs
+UNION ALL
+SELECT *
+FROM february_jobs
+UNION ALL
+SELECT *
+FROM march_jobs
+)
+
+SELECT
+    job_title_short,
+    skills,
+    skills_dim.type,
+    salary_year_avg
+FROM
+    Q1_jobs
+LEFT JOIN skills_job_dim skills_to_job ON Q1_jobs.job_id = skills_to_job.job_id
+LEFT JOIN skills_dim ON skills_dim.skill_id = skills_to_job.skill_id
+WHERE
+    salary_year_avg > 70000
+ORDER BY
+    salary_year_avg DESC

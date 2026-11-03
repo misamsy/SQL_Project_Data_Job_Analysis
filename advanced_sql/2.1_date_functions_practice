@@ -1,0 +1,50 @@
+/*
+Write a query to find the average salary both yearly ( salary year_avg )and hourly
+( salary_hour_avg ) for job postings that were posted after June 1, 2023. Group the results by
+job schedule type.
+*/
+SELECT
+    job_schedule_type,
+    AVG(salary_year_avg) AS "Salary Average",
+    AVG(salary_hour_avg) AS "Salary Hourly Average"
+FROM
+    job_postings_fact
+WHERE job_posted_date > '2023-01-01'
+GROUP BY
+    job_schedule_type
+
+
+/*
+Write a query to count the number of job postings for each month in 2023, adjusting the
+job_posted_date to be in 'America/New_York' time zone before extracting (hint) the month.
+Assume the job_posted_date is stored in UTC. Group by and order by the month.
+*/
+SELECT
+    EXTRACT(MONTH FROM job_posted_date AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS date_month_EST,
+    COUNT(job_id) AS job_posted_count
+FROM
+    job_postings_fact
+WHERE
+    EXTRACT(YEAR FROM job_posted_date AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') = 2023
+GROUP BY
+    date_month_EST
+ORDER BY
+    date_month_EST
+
+
+/*
+Write a query to find companies (include company name) that have posted jobs offering health
+insurance, where these postings were made in the second quarter of 2023. Use date extraction
+to filter by quarter.
+*/
+
+SELECT
+    cd.name
+FROM
+    job_postings_fact jpf
+JOIN 
+    company_dim cd ON jpf.company_id = cd.company_id
+WHERE
+    EXTRACT (QUARTER FROM jpf.job_posted_date) = 2 AND
+    EXTRACT (YEAR FROM jpf.job_posted_date) = 2023 AND
+    jpf.job_health_insurance = TRUE
